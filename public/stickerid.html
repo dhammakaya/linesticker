@@ -1,0 +1,112 @@
+<!DOCUMENT html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Sticker ID</title>
+  <link crossorigin='anonymous' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' rel='stylesheet'/>
+  <link crossorigin='anonymous' href='https://use.fontawesome.com/releases/v5.6.3/css/all.css' integrity='sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/' rel='stylesheet'/>
+  <link href='https://fonts.googleapis.com/css?family=Trirong' rel='stylesheet'/>
+  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet'/>
+  <style>
+   html {
+    font-size: 18px;
+   }
+   table {
+    width: 100%;
+    table-layout:fixed;
+    word-break: break-all;
+   }
+   .div {
+    max-width: 100%;
+    text-align: center;
+   }
+  </style>
+ </head>
+ <body>
+  <h2 style="color: #1735b7;">ค้นหา หมายเลข Sticker Line</h2>
+  <input class="form-control" id="Sourcelink" name="entry.793335684" placeholder="insert URL" type="text" value="https://store.line.me/stickershop/product/8467632" />
+  <br>
+  <div class="btn btn-primary" onclick="getSource(this);">ดำเนินการ</div>
+  <br>
+  <div id="Sourcein" style="display:none;"></div>
+  <div id="Sourceout" style="display:none;"></div>
+
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'/>
+  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js'/>	
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
+  <script type="text/javascript">
+   function getSource(e){
+    //e.preventDefault();
+    $('#Sourcein').hide();
+    var SourceHtml1 = document.getElementById("Sourcelink").value;
+	//window.alert(JSON.stringify(SourceHtml1));
+	var sUrl = 'http://www.whateverorigin.org/get?url=' + encodeURIComponent(SourceHtml1) + '&callback=?';
+	var SourceHtml2 = "";
+	/*
+    $.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent('http://google.com') + '&callback=?', function(data){
+	  alert(data.contents);
+    });
+	*/
+	$.getJSON(sUrl , function(data){
+       SourceHtml2 = JSON.stringify(JSON.parse(data.contents));
+	   alert(SourceHtml2);
+      }
+	);
+	var SourceHtml = "";
+    if (SourceHtml2 == "") {
+     document.getElementById('Sourcein').value = 'No Url or Invalid Url';
+     $('#Sourcein').show();
+    }else{
+     var SourceHtml = SourceHtml2.replace(/\<\/li\>/gm, 'ฅ|ฃ');
+     var aRetArray = SourceHtml.split("ฅ|ฃ");
+	 alert(aRetArray);
+     var UniqueId1 = 'https://stickershop.line-scdn.net/stickershop/v1/sticker/';
+     var lengthUniqueId1 = UniqueId1.length;
+     var UniqueId2 = '';
+     var UniqueId3 = '/android/sticker.png';
+     var lengthUniqueId3 = UniqueId3.length;
+     var sidsticker,sPrefix,sImgSticker,sInputSticker,sButtonSticker,sSuffix;
+     var SourceHtmlHead = '';
+     //var SourceHtmlBody1 = '<table class="table-responsive table-bordered table-hover table-condensed"><th>List Sticker</th>';
+	 var SourceHtmlBody1 = '';
+     var SourceHtmlBody2 = '';
+     for (var i = 0; i < aRetArray.length; i++) {
+      if(aRetArray[i].indexOf(UniqueId1)!=-1){
+       var position2 = aRetArray[i].lastIndexOf(UniqueId3);
+       var position1 = aRetArray[i].lastIndexOf(UniqueId1,position2-1) + lengthUniqueId1;
+       var position3 = position2 - position1;
+       sidsticker = aRetArray[i].substr(position1, position3);
+       if(sidsticker!=""){
+        sPrefix = '<li>';
+        sImgSticker = '<img src="'+'https://stickershop.line-scdn.net/stickershop/v1/sticker/' + sidsticker + '/android/sticker.png"/>';
+        sInputSticker = '<input id="'+'sidstck'+i+'" '+'value="line://app/1613121112-l2N56WgJ?sType=sticker&sid='+sidsticker+'"/>' ;
+        sButtonSticker = '<div id="bCopy'+i+'" '+'class="'+'btn btn-success"'+' onclick='+'"'+'CopyLinkApps('+"'"+'sidstck'+i+"'"+')"'+'>Copy</div>' ;
+        sSuffix = '</li>';
+        SourceHtmlBody2 = SourceHtmlBody2 + sPrefix + sImgSticker + sInputSticker + sButtonSticker + sSuffix;
+       }
+      }
+     };
+     //var SourceHtmlFooter = '</table>';
+	 var SourceHtmlFooter = '';
+     var SourceHtml = SourceHtmlHead + SourceHtmlBody1 + SourceHtmlBody2 + SourceHtmlFooter;
+     if(SourceHtmlBody2==""){
+      SourceHtmlBody2="<h2>No Sticker Line in Url</h2>";
+     }
+     var oSourceHtml = SourceHtmlHead + SourceHtmlBody1 + SourceHtmlBody2 + SourceHtmlFooter;
+     document.getElementById("Sourceout").innerHTML = oSourceHtml ;
+     $('#Sourceout').show();
+    }
+   }
+   
+   function CopyLinkApps(bCopy) {
+    //alert(bCopy);
+    var clipTextout = document.getElementById(bCopy);
+    clipTextout.select();
+    document.execCommand("copy");
+    window.alert(clipTextout.value);
+   }
+   
+  </script>
+ </body>
+</html>
